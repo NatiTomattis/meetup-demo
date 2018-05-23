@@ -1,0 +1,34 @@
+version: '2'
+services:
+  keepalived-backup:
+    cap_add:
+    - NET_ADMIN
+    image: arcts/keepalived:1.1.0
+    environment:
+      KEEPALIVED_AUTOCONF: 'true'
+      KEEPALIVED_INTERFACE: eth1
+      KEEPALIVED_STATE: BACKUP
+      KEEPALIVED_TRACK_INTERFACE_1: eth1
+      KEEPALIVED_UNICAST_PEER_0: 172.17.8.101
+      KEEPALIVED_UNICAST_SRC_IP: 172.17.8.102
+      KEEPALIVED_VIRTUAL_IPADDRESS_1: '"172.17.8.3"'
+      KEEPALIVED_VIRTUAL_ROUTER_ID: '2'
+    network_mode: host
+    labels:
+      io.rancher.scheduler.affinity:host_label: vrrp_role=backup
+  keepalived-master:
+    cap_add:
+    - NET_ADMIN
+    image: arcts/keepalived:1.1.0
+    environment:
+      KEEPALIVED_AUTOCONF: 'true'
+      KEEPALIVED_INTERFACE: eth1
+      KEEPALIVED_STATE: MASTER
+      KEEPALIVED_TRACK_INTERFACE_1: eth1
+      KEEPALIVED_UNICAST_PEER_0: 172.17.8.102
+      KEEPALIVED_UNICAST_SRC_IP: 172.17.8.101
+      KEEPALIVED_VIRTUAL_IPADDRESS_1: '"172.17.8.3"'
+      KEEPALIVED_VIRTUAL_ROUTER_ID: '2'
+    network_mode: host
+    labels:
+      io.rancher.scheduler.affinity:host_label: vrrp_role=master
